@@ -1,0 +1,121 @@
+import json
+
+users = {}
+roles = {}
+
+def save_policies(filename="policies.json"):
+    data = {"users": {k: list(v) for k, v in users.items()},
+            "roles": {k: list(v) for k, v in roles.items()}}
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
+    print("✅ Policies saved.")
+
+def load_policies(filename="policies.json"):
+    global users, roles
+    try:
+        with open(filename, "r") as f:
+            data = json.load(f)
+            users = {k: set(v) for k, v in data.get("users", {}).items()}
+            roles = {k: set(v) for k, v in data.get("roles", {}).items()}
+        print("✅ Policies loaded.")
+    except FileNotFoundError:
+        print("⚠️ No saved policies found. Starting fresh.")
+
+def create_role():
+    role = input("Role name: ").strip()
+    if role in roles:
+        print("⚠️ Role exists.")
+    else:
+        roles[role] = set()
+        print(f"✅ Role '{role}' created.")
+
+def assign_permission():
+    role = input("Role to assign permission to: ").strip()
+    if role not in roles:
+        print("⚠️ Role doesn't exist.")
+        return
+    perm = input("Permission (read/write/delete/etc): ").strip()
+    roles[role].add(perm)
+    print(f"✅ '{perm}' added to role '{role}'.")
+
+def create_user():
+    user = input("New user name: ").strip()
+    if user in users:
+        print("⚠️ User exists.")
+    else:
+        users[user] = set()
+        print(f"✅ User '{user}' created.")
+
+def assign_role():
+    user = input("User to assign role to: ").strip()
+    role = input("Role: ").strip()
+    if user not in users or role not in roles:
+        print("⚠️ User or role doesn't exist.")
+        return
+    users[user].add(role)
+    print(f"✅ Role '{role}' assigned to user '{user}'.")
+
+def check_access():
+    user = input("User to check: ").strip()
+    perm = input("Permission to check: ").strip()
+    if user not in users:
+        print("⚠️ User not found.")
+        return
+    for role in users[user]:
+        if perm in roles.get(role, []):
+            print(f"✅ Access GRANTED via role '{role}'.")
+            return
+    print("❌ Access DENIED.")
+
+def list_roles():
+    for r in roles:
+        print(f"Role: {r} | Permissions: {', '.join(roles[r]) or 'None'}")
+
+def list_users():
+    for u in users:
+        print(f"User: {u} | Roles: {', '.join(users[u]) or 'None'}")
+
+def menu():
+    print("\n=== IAM Policy Simulator ===")
+    print("1. Create Role")
+    print("2. Assign Permission to Role")
+    print("3. Create User")
+    print("4. Assign Role to User")
+    print("5. Check User Access")
+    print("6. List Roles")
+    print("7. List Users")
+    print("8. Save Policies")
+    print("9. Load Policies")
+    print("0. Exit")
+
+def main():
+    load_policies()
+    while True:
+        menu()
+        choice = input("Choose option: ").strip()
+        if choice == "1":
+            create_role()
+        elif choice == "2":
+            assign_permission()
+        elif choice == "3":
+            create_user()
+        elif choice == "4":
+            assign_role()
+        elif choice == "5":
+            check_access()
+        elif choice == "6":
+            list_roles()
+        elif choice == "7":
+            list_users()
+        elif choice == "8":
+            save_policies()
+        elif choice == "9":
+            load_policies()
+        elif choice == "0":
+            print("👋 Exiting...")
+            break
+        else:
+            print("❌ Invalid option.")
+
+if __name__ == "__main__":
+    main()
