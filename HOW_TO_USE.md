@@ -12,5 +12,5 @@ Option 1: Download ZIP
  Option 2: Clone the Repository (Requires Git)
 If you have Git installed, open your terminal and run:
 bash
-git clone https://github.com/yourusername/iam-policy-simulator.git
+git clone https://github.com/ECOhotz27/iam-policy-simulator.git
 cd iam-policy-simulator
